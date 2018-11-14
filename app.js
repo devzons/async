@@ -1,62 +1,31 @@
-document.getElementById('button1').addEventListener('click', loadCustomer);
+document.querySelector('.get-jokes').addEventListener('click', getJokes);
 
-document.getElementById('button2').addEventListener('click', loadCustomers);
+function getJokes(e) {
+  const number = document.getElementById('name').value;
 
-// Load customers
-function loadCustomers(e) {
   const xhr = new XMLHttpRequest();
 
-  xhr.open('GET', 'customers.json', true);
+  xhr.open('GET', `http://api.icndb.com/jokes/random/${number}`, true);
 
   xhr.onload = function() {
     if(this.status === 200){
+      const response = JSON.parse(this.responseText);
+      
+      let output = '';
 
-      const customers = JSON.parse(this.responseText);
+      if(response.type === 'success'){
+        response.value.forEach(function(joke) {
+          output += `<li>${joke.joke}</li>`;
+        });
+      } else {
+        output += '<li>Something went wrong</li>';
+      }
+      document.querySelector('.jokes').innerHTML = output;
 
-      let output ='';
-
-      customers.forEach(function(customer){
-        output += `
-          <ul>
-            <li>ID: ${customer.id}</li>
-            <li>ID: ${customer.name}</li>
-            <li>ID: ${customer.company}</li>
-            <li>ID: ${customer.phone}</li>
-          </ul>
-        `;
-      });      
-
-      document.getElementById('customers').innerHTML = output;
     }
   }
 
   xhr.send();
-}
 
-// Load single customer
-function loadCustomer(e) {
-  const xhr = new XMLHttpRequest();
-
-  xhr.open('GET', 'customer.json', true);
-
-  xhr.onload = function() {
-    if(this.status === 200){
-      // console.log(this.responseText);
-
-      const customer = JSON.parse(this.responseText);
-
-      const output = `
-        <ul>
-          <li>ID: ${customer.id}</li>
-          <li>ID: ${customer.name}</li>
-          <li>ID: ${customer.company}</li>
-          <li>ID: ${customer.phone}</li>
-        </ul>
-      `;
-
-      document.getElementById('customer').innerHTML = output;
-    }
-  }
-
-  xhr.send();
+  e.preventDefault();
 }
